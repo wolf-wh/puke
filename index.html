@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+    <script src="js/jquery-3.2.1.min.js"></script>
+</head>
+<style>
+    *{
+        margin: 0 ;
+        padding: 0 ;
+        border: 0;
+    }
+    body{
+        background: url('image/bj.jpg') no-repeat;
+        background-size: cover;
+    }
+    .prok{
+        width: 1200px;
+        height: 700px;
+        position: relative;
+        top: 20px;
+        left: 0;
+        right: 0;
+        margin:0 auto;
+    }
+    .pai{
+        width: 88px;
+        height: 120px;
+        background: #fff;
+        background-size: 100% 100%;
+        position: absolute;
+        top: 0px;
+        left: 350px;
+        margin: 0 200px;
+        font-size: 20px;
+        border: 1px solid #000;
+        line-height: 50px;
+        text-align: center;
+        opacity: 0;
+    }
+    .active{
+        outline: 2px solid aqua;
+    }
+    button{
+        width: 60px;
+        height:30px;
+        position: absolute;
+        top:470px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+    button.next{
+        top:520px;
+    }
+</style>
+<body>
+	<div class="prok">
+        <button class="last">上一张</button>
+        <button class="next">下一张</button>
+    </div>
+</body>
+</html>
+<script>
+    $(function(){
+        function hex2dec(hexText){
+            var hexnum=parseInt(hexText,16)/1000000000000000000;
+            var dec=hexnum.toString(10);
+            if (isNaN(dec)) {
+                dec = "0";
+            }
+            return dec;
+        }
+        console.log(hex2dec('0x2386f26fc10000'));
+        let arr = [];
+        let arrs = ['a','d','h','s'];
+        let flag = [];
+        let prok = $('.prok');
+        for(let i = 0; i < 52;i++){
+            let color = arrs[Math.floor(Math.random()*4)],
+                    num = Math.floor(Math.random()*13+1);
+            do{
+                color = arrs[Math.floor(Math.random()*4)],
+                        num = Math.floor(Math.random()*13+1);
+            }while(flag[color +'_'+ num]);
+            arr.push({color,num});
+            flag[color +'_'+ num] = 'true';
+        }
+        let index = 0;
+        for(let i = 0;i < 7; i++){
+            for(let j = 0; j <= i;j++){
+                let divs = $('<div>');
+                let left = 350 - 50*i + 100*j;
+                let top = 50*i;
+                divs.addClass('pai')
+                        .attr('id',`${i}_${j}`)
+                        .data('num',arr[index]['num'])
+                        .css({backgroundImage:`url(img/${arr[index].color}${arr[index].num}.jpg)`})
+                        .html(arr[index].color+'--'+arr[index].num)
+                        .appendTo('.prok')
+                        .delay(150*i)
+                        .animate({left,top,opacity:1});
+                index++;
+            }
+        }
+        for(;index < 52;index++){
+            let divs = $('<div>');
+            divs.addClass('pai left')
+                    .attr('id',-2+'_'+-2)
+                    .data('num',arr[index].num)
+                    .css({backgroundImage:`url(img/${arr[index].color}${arr[index].num}.jpg)`})
+                    .html(arr[index].color + '--' +arr[index].num)
+                    .appendTo('.prok')
+                    .delay(50*index)
+                    .animate({left:'0',top:'470',opacity:1})
+        }
+
+        let first = null;
+        prok.on('click','.pai', function () {
+            let coords = $(this).attr('id').split('_');
+            if($(`#${coords[0]*1+1}_${coords[1]*1}`).length || $(`#${coords[0]*1+1}_${coords[1]*1+1}`).length){
+                return;
+            };
+            if($(this).hasClass('active')){
+                $(this).animate({top:'+=20'});
+            }else{
+                $(this).animate({top:'-=20'});
+            }
+            $(this).toggleClass('active');
+
+            if(!first){
+                first = $(this);
+            }else{
+                if(first.data('num') + $(this).data('num') == 14){
+                    $('.active').animate({
+                        top:1,left:700
+                    }, function () {
+                        $(this).remove();
+                    });
+                }else{
+                    $('.active').animate({"top":'+=20'}).queue(function () {
+                        $(this).removeClass('active');
+                        $(this).dequeue();
+                    })
+                }
+                first = null;
+            }
+        });
+
+        let btnR = $('button').last();
+        let btnL =  $('button').first();
+        let zIndex = 0;
+        btnR.on('click',function(){
+            if(!$('.left').length){
+                return;
+            }
+            zIndex ++;
+            $('.left').last().css({zIndex}).removeClass('left').addClass('right').animate({left:'+=700'});
+        })
+        btnL.on('click',function(){
+//            if(!$('.right').length){
+//                return;
+//            }
+//            if(!$('.left').length){
+//                let zIndex = $('.left:last').css('zIndex')*1+1;
+//                $('.right').each(function(index,obj){
+//                    $(obj).removeClass('right').addClass('left').delay(index*60).animate({left:'-=700',zIndex});
+//                });
+//            }else{
+//                 $('.right').first().css({zIndex}).removeClass('right').addClass('left').animate({left:'-=700'});
+//            }
+             !!$('.right').length && $('.right').each(function(index,obj){
+              $(obj).removeClass('right').addClass('left').delay(index*60).animate({left:'-=700',zIndex});
+             })
+        })
+    })
+
+</script>
