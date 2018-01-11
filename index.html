@@ -106,10 +106,11 @@
         }
         for(;index < 52;index++){
             let divs = $('<div>');
+            let images = `${arr[index].color}${arr[index].num}.JPG`|| `${arr[index].color}${arr[index].num}.jpg`
             divs.addClass('pai left')
                     .attr('id',-2+'_'+-2)
                     .data('num',arr[index].num)
-                    .css({backgroundImage:`url(img/${arr[index].color}${arr[index].num}.jpg)`})
+                    .css({backgroundImage:`url(img/${images})`})
                     .html(arr[index].color + '--' +arr[index].num)
                     .appendTo('.prok')
                     .delay(50*index)
